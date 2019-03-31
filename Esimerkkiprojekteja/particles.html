@@ -1,0 +1,104 @@
+﻿<html>
+<body onload="setup()">
+
+<canvas id="canvas" width="500" height="500" style="border: 5px solid #eeeeff;"></canvas>
+<p id="p">B</p>
+
+<script>
+
+var balls = [];
+var ctx;
+var canvas;
+var p;
+var beta = 0.99;
+var n = 100;
+var ka = 100;
+var kr = 50;
+var mouseX = 250;
+var mouseY = 250;
+var r = 10;
+
+function setup() {
+	p = document.getElementById("p");
+	canvas = document.getElementById("canvas");
+	ctx = canvas.getContext("2d");
+	for(let i=0;i<n;i++) {
+		balls[i]={
+			x:Math.floor(Math.random()*500),
+			y:Math.floor(Math.random()*500),
+			vx:Math.floor(Math.random()*10)-5,
+			vy:Math.floor(Math.random()*10)-5
+		}
+	}
+	canvas.addEventListener("mousemove",(event) => {mouseX = event.clientX; mouseY = event.clientY;});
+	var t = setInterval(draw,30);
+}
+
+
+function draw() {
+	ctx.fillStyle="white";
+	ctx.rect(0,0,500,500);
+	ctx.fill();
+	for(let i=0;i<balls.length-1;i++) {
+		for(let j = i+1; j < balls.length; j++) {
+			let dx = balls[j].x - balls[i].x;
+			let dy = balls[j].y - balls[i].y;
+			let d = Math.sqrt(dx*dx+dy*dy);
+			if (d < 2*r) {
+				balls[i].vx *= -.3;
+				balls[i].vy *= -.3;
+				balls[j].vx *= -.3;
+				balls[j].vy *= -.3;
+			}
+			let a = kr/(d*d);
+			let ay = dy/d*a;
+			let ax = dx/d*a;
+
+			balls[i].vx -= ax;
+			balls[i].vy -= ay;
+			balls[j].vx += ax;
+			balls[j].vy += ay;
+		}
+		ctx.beginPath();
+		ctx.arc(balls[i].x,balls[i].y,r,0,2*Math.PI);
+		ctx.stroke();
+		ctx.fillStyle="#fafafa";
+		ctx.fill();
+
+		let dx = balls[i].x - mouseX;
+		let dy = balls[i].y - mouseY;
+		let d = Math.sqrt(dx*dx+dy*dy);
+		let a = ka/(d*d);
+		let ay = dy/d*a;
+		let ax = dx/d*a;
+
+		if (d < 2*r) {
+			balls[i].vx *= -.3;
+			balls[i].vy *= -.3;
+			}
+	
+		balls[i].vx -= ax;
+		balls[i].vy -= ay;
+		
+		balls[i].vy = beta*balls[i].vy;
+		balls[i].vx = beta*balls[i].vx;
+		
+		
+		balls[i].x+=balls[i].vx;
+		balls[i].y+=balls[i].vy;
+		
+		if(balls[i].x<10 || balls[i].x>490) balls[i].vx = -balls[i].vx;
+		if(balls[i].y<10 || balls[i].y>490) balls[i].vy = -balls[i].vy;
+	}
+	ctx.beginPath();
+	ctx.arc(mouseX, mouseY, 10, 0, 2*Math.PI);
+	ctx.stroke();
+	ctx.fillStyle="#ffeeee";
+	ctx.fill();
+	//p.innerHTML = "x:" + mouseX + ", y:" + mouseY;
+}
+
+</script>
+
+</body>
+</html>

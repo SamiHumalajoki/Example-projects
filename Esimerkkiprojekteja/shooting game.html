@@ -1,0 +1,104 @@
+﻿<html>
+<body onload="game()">
+<div id="game">
+		<div id="divi"></div>
+</div>
+
+<p id="p"></p>
+<style>
+	#divi{
+		background-color:#eeeeee;
+		width:100px;
+		height:100px;
+		left:500px;
+		top:500px;
+		position: absolute;
+	}
+	#game{
+		width:1000px;
+		height:600px;
+		border: 2px solid;
+
+	
+</style>
+
+<script>
+var foes = [];
+
+function game() {
+	var n = 4;	
+	var game = document.getElementById("game");
+	var mouseX;
+	var mouseY;
+	for (let i = 0; i < n; i++) {
+		var foe = new Foe(game);
+		foes.push(foe);
+	}
+
+	game.addEventListener("mousemove", (event) => {
+		mouseX = event.clientX;
+		mouseY = event.clientY;
+		
+		document.getElementById('divi').style.left = mouseX + "px";
+		//document.getElementById('divi').style.top = mousey + "px";
+	});
+	game.addEventListener("click", () => new Bullet(game,mouseX+50));
+
+	function Foe(div) {
+		var t = this;
+		t.div = document.createElement("div");
+		t.div.style.width=30;
+		t.div.style.height=30;
+		t.div.style.position="absolute";
+		t.div.style.backgroundColor = "pink";
+		t.x = Math.floor(Math.random()*1000);
+		t.div.style.left = t.x + "px";
+		t.div.style.top = "100px";
+		t.vx = 10;
+		div.appendChild(t.div);
+		
+		setInterval(t.move = () => {
+			//document.getElementById("p").innerHTML= t.x;
+			t.x += t.vx;
+			t.div.style.left = t.x + "px";
+			if (Math.random() > 0.99 || t.x < 0 || t.x > 1000) t.vx = -t.vx;
+		}, 20);
+ 	}
+
+	function Bullet(div,x) {
+		var t = this;
+		t.y = 500;
+		t.div = document.createElement("div");
+		t.div.style.width=10;
+		t.div.style.height=10;
+		t.div.style.position="absolute";
+		t.div.style.backgroundColor = "black";
+		t.div.style.left = x + "px";
+		t.div.style.top = t.y + "px";
+		div.appendChild(t.div);
+		setInterval(t.t = function() {
+			if(t.y>0) {
+				t.y-=10;
+				t.div.style.top = t.y+"px";
+			}
+			else {
+				clearInterval(t.t);
+				div.removeChild(t.div);
+			}
+			if(t.y < 130 && t.y > 90) {
+				for(let i = 0; i < foes.length; i++) {
+					if(x > foes[i].x - 10 && x < foes[i].x + 40) {
+						clearInterval(foes[i].move);
+						div.removeChild(foes[i].div);
+						foes.splice(i, 1);
+					}
+				}
+			}
+		},20);
+		
+	}
+}
+</script>
+	
+</body>
+</html>

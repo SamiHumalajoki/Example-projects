@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<!--
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+-->
+<html>
+    <head>
+        <title>Frustration</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    </head>
+    <body  onload="setup()" onresize="setSizes">
+        <canvas id="board" width="1000" height="600" style="border:1px solid #d3d3d3;">
+        Your browser does not support the HTML5 canvas tag.</canvas>
+	<p style="font-size: 20px">Click draw and drag cards to the right. Avoid getting a pair</p>
+        <p id="p1"></p>
+        <p id="p2"></p>
+        <p id="p3"></p>
+        <p id="count">count:1</p>
+        <p id="card">rank:</p>
+        <p id="score" style="position:absolute; top: 0px; left: 200px; font-size: 200px"></p>        
+        <button type="button" onclick="draw()">Draw</button>
+        <script src="game.js"></script>
+    </body>
+</html>

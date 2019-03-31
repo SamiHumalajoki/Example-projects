@@ -1,0 +1,114 @@
+﻿<html>
+<body onload="setup()">
+
+<canvas id="canvas" width="500" height="500" style="border: 5px solid #eeeeff;"></canvas>
+<p id="p">B</p>
+
+<script>
+
+var b = [];
+var ctx;
+var canvas;
+var p;
+var eg = 0.7;
+var eb = 0.7;
+var g = 1;
+var beta = 0.99;
+var n = 10;
+var k = 100;
+var mouseX = 1000;
+var mouseY = 1000;
+
+var dt = 30;
+
+function setup() {
+	p = document.getElementById("p");
+	canvas = document.getElementById("canvas");
+	ctx = canvas.getContext("2d");
+	for(let i=0;i<n;i++) {
+		b[i] = new Ball();	
+		
+	}
+	canvas.addEventListener("mousemove",(event) => {mouseX = event.clientX; mouseY = event.clientY;});
+	canvas.addEventListener("click", (event) => {
+		let ball = new Ball();
+		ball.x = event.clientX;
+		ball.y = event.clientY + b[0].r + ball.r;
+		b.push(ball);
+	});
+	var t = setInterval(draw,dt);
+}
+
+function Ball() {
+	let r = Math.floor(Math.random()*30)+10;
+	let dens =  Math.floor(Math.random()*100);
+	this.x = Math.floor(Math.random()*500);
+	this.y = Math.floor(Math.random()*500/2);
+	this.vx = Math.floor(Math.random()*10)-5;
+	this.vy = Math.floor(Math.random()*10)-5;
+	this.dens = dens;
+	this.r = r;
+	//this.m = 1;
+	this.m = r*r*Math.PI*dens;
+	this.color = "hsl(" + Math.random()*360 + ", 50%, " + (100-dens) + "%)";
+}
+
+function draw() {
+	ctx.fillStyle="white";
+	ctx.rect(0,0,500,500);
+	ctx.fill();
+
+	b[0].vx = (b[0].x - mouseX);
+	b[0].vy = (b[0].y - mouseY);
+	b[0].x = mouseX;
+	b[0].y = mouseY;
+	p.innerHTML = "vx:" + b[0].vx + ", vy:" + b[0].vy;
+
+	for(let i=0;i<b.length-1;i++) {
+		for(let j=i+1;j<b.length;j++) {
+			let dx = b[j].x-b[i].x;
+			let dy = b[j].y-b[i].y;
+			let d2 = dx*dx + dy*dy;
+			let d = Math.sqrt(d2);
+			
+			if (d < b[i].r+b[j].r) {
+				b[j].x = b[i].x + (b[i].r+b[j].r)/d * dx;
+				b[j].y = b[i].y + (b[i].r+b[j].r)/d * dy;
+				let m1 = b[i].m;
+				let m2 = b[j].m;
+				let vx1 = b[i].vx;
+				let vy1 = b[i].vy;
+				let vx2 = b[j].vx;
+				let vy2 = b[j].vy;
+				b[i].vx = eb*(vx1 - 2*m2/(m1+m2) * ((vx1-vx2)*(-dx) + (vy1-vy2)*(-dy)) / d2 * (-dx));
+				b[i].vy = eb*(vy1 - 2*m2/(m1+m2) * ((vx1-vx2)*(-dx) + (vy1-vy2)*(-dy)) / d2 * (-dy));
+				b[j].vx = eb*(vx2 - 2*m1/(m1+m2) * ((vx2-vx1)*dx + (vy2-vy1)*dy) / d2 * dx);
+				b[j].vy = eb*(vy2 - 2*m1/(m1+m2) * ((vx2-vx1)*dx + (vy2-vy1)*dy) / d2 * dy);
+			}
+		}
+	}
+	for (let i=0;i<b.length;i++) {
+		ctx.beginPath();
+		ctx.arc(b[i].x,b[i].y,b[i].r,0,2*Math.PI);
+		ctx.stroke();
+		ctx.fillStyle=b[i].color;
+		ctx.fill();
+	}
+	for (let i=1;i<b.length;i++) {
+
+		b[i].x+=b[i].vx;
+		b[i].y+=b[i].vy;
+		b[i].vy += g;
+		
+		if(b[i].x < b[i].r) {b[i].x = b[i].r; b[i].vx = -eg*b[i].vx;}
+		if(b[i].x > 500-b[i].r) {b[i].x = 500-b[i].r; b[i].vx = -eg*b[i].vx;}
+
+		if(b[i].y < b[i].r) {b[i].y = b[i].r; b[i].vy = -eg*b[i].vy;}
+		if(b[i].y > 500-b[i].r) {b[i].y = 500-b[i].r; b[i].vy = -eg*b[i].vy;}
+	}
+}
+
+</script>
+
+</body>
+</html>
